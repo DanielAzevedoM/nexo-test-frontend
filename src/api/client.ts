@@ -1,7 +1,20 @@
 import axios from 'axios';
 
+function getBaseUrl(): string {
+  const envUrl = import.meta.env.VITE_API_URL?.trim();
+  if (!envUrl) {
+    return '/api';
+  }
+  // Se já for caminho relativo (/api) ou possuir protocolo (http/https), usa direto
+  if (envUrl.startsWith('/') || envUrl.startsWith('http://') || envUrl.startsWith('https://')) {
+    return envUrl.replace(/\/+$/, '');
+  }
+  // Caso tenha sido inserido apenas o domínio (ex: api.dominio.com/api), adiciona https://
+  return `https://${envUrl}`.replace(/\/+$/, '');
+}
+
 export const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || '/api',
+  baseURL: getBaseUrl(),
   headers: {
     'Content-Type': 'application/json',
   },
